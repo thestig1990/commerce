@@ -1,0 +1,48 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <h2>Create Listing</h2>
+    
+    {% if message %}
+        <div> {{ message }} </div>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label  for="title">Title:</label>
+                <input class="form-control" type="text" name="title" id="title" >
+            </div>
+
+            <div class="form-group">
+                <label for="description">Decription:</label>
+                <textarea class="form-control" name="description" id="description" cols="50" rows="5"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="bid">Starting Bid:</label>
+                <input class="form-control" type="text" name="bid" id="bid">
+            </div>
+
+            <div class="form-group">
+                <label for="url">Image URL:</label>
+                <input class="form-control" type="url" name="url" id="url">
+            </div>
+
+            <div class="form-group">
+                <label for="category">Choose your category:</label>
+                <select class="form-control" name="category" id="category">
+                    <option value="DR" selected>Drones</option>
+                    <option value="EL">Electronics</option>
+                    <option value="FA">Fashion</option>
+                    <option value="HO">Home</option>
+                    <option value="TO">Toys</option>
+                </select>
+            </div>
+            
+            <input class="btn btn-primary" type="submit" value="Place a Listing">
+
+        </form>
+    {% endif %}
+
+{% endblock  %}
