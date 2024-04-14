@@ -11,12 +11,16 @@
         <h1>Auctions</h1>
         <div>
             {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
+                <div class="alert alert-secondary">
+                    Signed in as <strong>{{ user.username }}</strong>.
+                </div>
             {% else %}
-                Not signed in.
+                <div class="alert alert-secondary">
+                    Not signed in.
+                </div>
             {% endif %}
         </div>
-        <ul class="nav">
+        <ul class="nav nav-tabs">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
             </li>
