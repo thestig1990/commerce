@@ -2,23 +2,31 @@
 
 {% block body %}
 
-
 {% if user.is_authenticated %}
     {% if listing not in user.watchlist.all %}
-        <a href="{% url 'add_to_watchlist' listing.title%}" id="add_to_watchlist">Add to Wathlist</a>
+        <a href="{% url 'add_to_watchlist' listing.title%}" class="badge badge-secondary" style="margin-bottom: 18px;">
+            Add to Wathlist
+        </a>
     {% else %}
-        <a href="{% url 'remove_from_watchlist' listing.title %}" id="remove_from_watchlist"> Remove from Watchlist</a>
+        <a href="{% url 'remove_from_watchlist' listing.title %}" class="badge badge-warning" style="margin-bottom: 18px;">
+            Remove from Watchlist
+        </a>
     {% endif %}
 {% else %}
-    <p>Log in to manage your Watchlist</p>
+    <div class="alert alert-info" role="alert">
+        Log in to manage your Watchlist!
+    </div>
 {% endif %}
 
-<form id="watchlist_form" method="post">
-    {% csrf_token %}
-    <input type="hidden" name="title" value="{{ listing.title }}">
-    <input type="hidden" name="action" value="">
-    <input type="submit" value="Submit">
-</form>
+
+{% if messages %}
+    <ul class="list-group" style="margin: 0 0 10px 0">
+    {% for message in messages %}
+        <li class="list-group-item list-group-item-info">{{ message }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
 
 <div class="card mb-3 bg-light">
     {% if listing.image %}

@@ -113,37 +113,25 @@ def listing_detail(request, title):
 def add_to_watchlist(request, title):
     user = request.user
     listing = Listing.objects.get(title=title)
-
-    if request.method == "POST":
-        action = request.POST['action']
-        
-        if action == "add_to_watchlist" and listing not in user.watchlist.all():
-            user.watchlist.add(listing)
-            messages.success(request, "The item has been successfully added to the Watchlist.")
-            return redirect('listing_detail', title)
-        elif action == "remove_from_watchlist" and listing in user.watchlist.all():
-            user.watchlist.remove(listing)
-            messages.success(request, "The item has been successfully deleted from the Watchlist.")
-            return redirect('listing_detail', title)
-
-    return redirect('listing_detail', title)
+    
+    if listing in user.watchlist.all():
+        return redirect('listing-detail', title=title)
+    
+    user.watchlist.add(listing)
+    messages.success(request, "The item has been successfully added to the Watchlist.")
+    
+    return redirect('listing-detail', title=title)
 
 
 @login_required
 def remove_from_watchlist(request, title):
     user = request.user
     listing = Listing.objects.get(title=title)
-
-    if request.method == 'POST':
-        action = request.POST['action']
-        
-        if action == "remove_from_watchlist" and listing in user.watchlist.all():
-            user.watchlist.remove(listing)
-            messages.success(request, "The item has been successfully deleted from the Watchlist.")
-            return redirect('listing_detail', title)
-        elif action == "add_to_watchlist" and listing not in user.watchlist.all():
-            user.watchlist.add(listing)
-            messages.success(request, "The item has been successfully added to the Watchlist.")
-            return redirect('listing_detail', title)
-
-    return redirect('listing_detail', title)
+    
+    if listing not in user.watchlist.all():
+        return redirect('listing-detail', title=title)
+    
+    user.watchlist.remove(listing)
+    messages.success(request, "The item has been successfully deleted from the Watchlist.")
+    
+    return redirect('listing-detail', title=title)
