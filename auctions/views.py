@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -100,7 +100,7 @@ def create_listing(request):
 
 
 def listing_detail(request, title):
-    listing = Listing.objects.get(title=title)
+    listing = get_object_or_404(Listing, title=title)
     
     context = {
     "listing": listing,
@@ -112,7 +112,7 @@ def listing_detail(request, title):
 @login_required
 def add_to_watchlist(request, title):
     user = request.user
-    listing = Listing.objects.get(title=title)
+    listing = get_object_or_404(Listing, title=title)
     
     if listing in user.watchlist.all():
         return redirect('listing-detail', title=title)
@@ -126,7 +126,7 @@ def add_to_watchlist(request, title):
 @login_required
 def remove_from_watchlist(request, title):
     user = request.user
-    listing = Listing.objects.get(title=title)
+    listing = get_object_or_404(Listing, title=title)
     
     if listing not in user.watchlist.all():
         return redirect('listing-detail', title=title)
