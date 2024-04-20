@@ -77,7 +77,7 @@ def create_listing(request):
             category = request.POST["category"]
 
             try:
-                listing = Listing.objects.create(
+                Listing.objects.create(
                     title=title,
                     description=description,
                     starting_bid=int(starting_bid),

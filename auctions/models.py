@@ -37,6 +37,7 @@ class Listing(models.Model):
 class Bid(models.Model):
     bid = models.IntegerField()
     auction = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="auction")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, related_name="user")
     
     def __str__(self):
         return f"{self.id} - {self.bid}."
@@ -45,6 +46,7 @@ class Bid(models.Model):
 class Comment(models.Model):
     comment = models.TextField()
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="listing")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     
     def __str__(self):
         return f"{self.id} - {self.comment}."
