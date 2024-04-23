@@ -71,7 +71,10 @@
                     <p>{{ error_message }}</p>
                 </div>
             {% endif %}
-                
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Log in to place a Bid!
+            </div>        
         {% endif %}
             
         <h6 class="card-detail">Details:</h6>
