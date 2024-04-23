@@ -1,4 +1,6 @@
 {% extends "auctions/layout.html" %}
+{% load custom_filters %}
+
 
 {% block body %}
     <h2>Active Listings</h2>
@@ -19,7 +21,15 @@
                     <a href="{% url 'listing-detail' listing.title%}">{{ listing.title }}</a>
                 </h5>
                 <p class="card-text">{{ listing.description|linebreaksbr}}</p>
-                <span class="badge bg-primary">Current Bid: {{ listing.starting_bid }}$</span>
+                {% with last_bid=last_bids|get_item:listing.title %}
+                    {% if last_bid %}
+                        <h6><span class="badge bg-info">Current Bid: {{ last_bid }}$</span></h6>
+                    {% elif not last_bid%}
+                        <h6><span class="badge bg-info">Current Bid: {{ listing.starting_bid }}$</span></h6>
+                    {% else %}
+                        <h6><span class="badge bg-info">No bids yet and no starting bid:</span></h6>
+                    {% endif %}
+                {% endwith %}
             </div>
         </div>
     {% endfor %}

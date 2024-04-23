@@ -29,19 +29,52 @@
 
 
 <div class="card mb-3 bg-light">
+    <div class="card-header">
+        <h5>Listing: {{ listing.title }}</h5>
+    </div>
+
     {% if listing.image %}
         <img 
         src="{{ listing.image }}"
-        class="card-img-top"
+        class="card-img-top mx-auto"
         alt="Auction Item"
-        style="width: 200px; height: 200px;">
+        style="max-width: 35%; height: auto;">
     {% endif %}
 
     <div class="card-body">
-        <h5 class="card-title">{{ listing.title }}</h5>
-        <span class="badge bg-primary">Current Bid: {{ listing.starting_bid }}$</span>
-        <br></br>
-        <h6 class="card-detail">Detail:</h6>
+        <div class="mb-4">
+            {% if highest_bid %}
+                <h6><span class="badge bg-info">Current Bid: {{ highest_bid }}$</span></h6>
+            {% elif start_bid %}
+                <h6><span class="badge bg-info">Current Bid: {{ start_bid }}$</span></h6>
+            {% else %}
+                <h6><span class="badge bg-info">Current Bid: {{ start_bid }}$</span></h6>
+            {% endif %}
+        </div>
+        
+        {% if user.is_authenticated %}
+            <form action="{% url 'place_bid' listing.title %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="bid_amount">Bid amount:</label>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="bid_amount" name="bid_amount" placeholder="Bid">
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary" value="Place bid">
+                    </div>
+                </div>
+            </form>
+            
+            {% if error_message %}
+                <div class="alert alert-danger" role="alert">
+                    <p>{{ error_message }}</p>
+                </div>
+            {% endif %}
+                
+        {% endif %}
+            
+        <h6 class="card-detail">Details:</h6>
         <p class="card-text">{{ listing.description|linebreaksbr }}</p>
     </div>
 </div>

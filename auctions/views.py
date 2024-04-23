@@ -10,8 +10,24 @@ from .models import User, Listing, Bid, Comment
 
 
 def index(request):
+    # Get all listing objects
+    listings = Listing.objects.all()
+
+    # Create a dict where the last highest bids for each listing are saved
+    last_bids = {}
+
+    # For each listing get the last highest bid if it exist
+    for listing in listings:
+        try:
+            highest_bid = listing.bids.order_by("-amount").first().amount
+        except AttributeError:
+            highest_bid = None
+        last_bids[listing.title] = highest_bid
+    
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all()})
+        "listings": listings,
+        "last_bids": last_bids,
+    })
 
 
 def login_view(request):
@@ -100,10 +116,24 @@ def create_listing(request):
 
 
 def listing_detail(request, title):
+    # Get a listing object by its title
     listing = get_object_or_404(Listing, title=title)
+
+    # Get the last highest bid for the listing if it exist
+    try:
+        highest_bid = listing.bids.order_by("-amount").first().amount
+    except AttributeError:
+        highest_bid = None
+
+    if highest_bid is None:
+        start_bid = listing.starting_bid
+    else:
+        start_bid = None
     
     context = {
     "listing": listing,
+    "highest_bid": highest_bid,
+    "start_bid": start_bid
     }
 
     return render(request, "auctions/listing_detail.html", context)
@@ -135,3 +165,45 @@ def remove_from_watchlist(request, title):
     messages.success(request, "The item has been successfully deleted from the Watchlist.")
     
     return redirect('listing-detail', title=title)
+
+
+@login_required
+def place_bid(request, title):
+    listing = get_object_or_404(Listing, title=title)
+
+    if request.method == "POST":
+        bid_amount = request.POST["bid_amount"]
+
+        try:
+            bid_amount = int(bid_amount)
+        except ValueError:
+            return render(request, "auctions/listing_detail.html", {
+                "listing": listing,
+                "bid": bid,
+                "error_message": "Invalid bid amount."
+            })
+
+        if bid_amount <= listing.starting_bid:
+            return render(request, "auctions/listing_detail.html", {
+                "listing": listing,
+                "error_message": "Bid amount must be greater than the starting bid - " + str(listing.starting_bid) + "$.",
+                "highest_bid": listing.bids.order_by('-amount').first().amount,
+                "start_bid": listing.starting_bid
+            })
+
+        if listing.bids.exists() and bid_amount <= listing.bids.order_by('-amount').first().amount:
+            return render(request, "auctions/listing_detail.html", {
+                "listing": listing,
+                "error_message": "Bid amount must be greater than the current highest bid - " + str(listing.bids.order_by('-amount').first().amount) + "$.",
+                "highest_bid": listing.bids.order_by('-amount').first().amount,
+                "start_bid": listing.starting_bid
+            })
+
+        # Save bid
+        bid = Bid(user=request.user, listing=listing, amount = bid_amount)
+        bid.save()
+
+        #return redirect("listing-detail", title=title)
+        return HttpResponseRedirect(reverse("listing-detail", args=(listing.title,)))
+    else:
+        return redirect("listing-detail", title=title)

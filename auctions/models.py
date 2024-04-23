@@ -35,20 +35,20 @@ class Listing(models.Model):
 
 
 class Bid(models.Model):
-    bid = models.IntegerField()
-    auction = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="auction")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, related_name="user")
+    amount = models.IntegerField()
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, default=None, related_name="bids")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, related_name="users")
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.id} - {self.bid}."
+        return f"Id: {self.id}; {self.amount}$ per Listing - {self.listing.title} and User - {self.user.username}."
 
 
 class Comment(models.Model):
     comment = models.TextField()
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="listing")
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"{self.id} - {self.comment}."
+        return f"Id: {self.id}; comment - {self.comment}; per Listing {self.listing.title}  from User - {self.user.username}."
