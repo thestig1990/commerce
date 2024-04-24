@@ -129,11 +129,15 @@ def listing_detail(request, title):
         start_bid = listing.starting_bid
     else:
         start_bid = None
+
+    # Get all listing comments
+    comments = listing.comments.all()
     
     context = {
     "listing": listing,
     "highest_bid": highest_bid,
-    "start_bid": start_bid
+    "start_bid": start_bid,
+    "comments": comments,
     }
 
     return render(request, "auctions/listing_detail.html", context)
@@ -169,6 +173,7 @@ def remove_from_watchlist(request, title):
 
 @login_required
 def place_bid(request, title):
+    # Get a listing object by its title
     listing = get_object_or_404(Listing, title=title)
 
     if request.method == "POST":
@@ -200,10 +205,27 @@ def place_bid(request, title):
             })
 
         # Save bid
-        bid = Bid(user=request.user, listing=listing, amount = bid_amount)
+        bid = Bid(user=request.user, listing=listing, amount=bid_amount)
         bid.save()
 
         #return redirect("listing-detail", title=title)
         return HttpResponseRedirect(reverse("listing-detail", args=(listing.title,)))
     else:
         return redirect("listing-detail", title=title)
+
+
+@login_required
+def add_comment(request, title):
+    # Get listing object by its title
+    listing = get_object_or_404(Listing, title=title)
+
+    if request.method == "POST":
+        comment = request.POST["comment"]
+
+        # Save comment
+        comment_obj = Comment(comment=comment, listing=listing, user=request.user)
+        comment_obj.save()
+        return redirect("listing-detail", title=title)
+    else:
+        return redirect("listing-detail", title=title)
+    

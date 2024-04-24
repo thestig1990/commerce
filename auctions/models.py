@@ -46,9 +46,9 @@ class Bid(models.Model):
 
 class Comment(models.Model):
     comment = models.TextField()
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="comments")
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"Id: {self.id}; comment - {self.comment}; per Listing {self.listing.title}  from User - {self.user.username}."
+        return f"Id: {self.id}; comment - {self.comment}; per Listing {self.listing.title} from User - {self.user.username}."

@@ -80,6 +80,54 @@
         <h6 class="card-detail">Details:</h6>
         <p class="card-text">{{ listing.description|linebreaksbr }}</p>
     </div>
+
+    <div class="card-footer">
+
+        {% if user.is_authenticated %}
+            <form action="{% url 'add_comment' listing.title %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="comment">Leave your comment:</label>
+                    <div class="form-group">
+                        <textarea class="form-control" id="comment" name="comment" rows=3></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary" value="Add comment">
+                    </div>
+                </div>
+            </form>
+
+            <h4 class="mb-0">Recent comments</h4>
+            <p class="fw-light mb-4 pb-2">Latest Comments section by users</p>
+
+            {% for comment in comments %}
+            <div class="d-flex flex-start">
+                <div>
+                    <h6 class="fw-bold mb-1">{{ comment.user.username }}</h6>
+                    <div class="d-flex align-items-center mb-3">
+                        <p class="mb-0">
+                            {{ comment.timestamp }}
+                            <!-- <span class="badge bg-primary">Pending</span> -->
+                        </p>
+                    </div>
+                    <p class="mb-1">
+                        {{ comment.comment }}
+                    </p>
+                </div>
+            </div>
+
+            <hr class="my-0" />
+
+            <div class="row mb-4"></div>
+            {% endfor %}
+
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Log in to place a Comment!
+            </div>  
+
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}
