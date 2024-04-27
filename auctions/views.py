@@ -91,6 +91,7 @@ def create_listing(request):
             starting_bid = request.POST["bid"]
             image_url = request.POST["url"]
             category = request.POST["category"]
+            user = request.user
 
             try:
                 Listing.objects.create(
@@ -98,7 +99,8 @@ def create_listing(request):
                     description=description,
                     starting_bid=int(starting_bid),
                     image=image_url,
-                    category=category
+                    category=category,
+                    user=user
                 )
             except:
                 return render(request, "auctions/create_listing.html", {

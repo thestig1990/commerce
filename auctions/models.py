@@ -29,6 +29,7 @@ class Listing(models.Model):
         choices=CATEGORY_CHOICES,
         default=DRONES,
     )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1, related_name="listings")
     
     def __str__(self):
         return f"{self.id}: {self.title.split(" ")[0]} --> Starting bid - {self.starting_bid}, Category - {self.category}."
