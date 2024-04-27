@@ -176,6 +176,10 @@ def place_bid(request, title):
     # Get a listing object by its title
     listing = get_object_or_404(Listing, title=title)
 
+    # Get a highest bid and starting bid for the listing
+    highest_bid = listing.bids.order_by('-amount').first().amount
+    start_bid = listing.starting_bid,
+
     if request.method == "POST":
         bid_amount = request.POST["bid_amount"]
 
@@ -184,31 +188,31 @@ def place_bid(request, title):
         except ValueError:
             return render(request, "auctions/listing_detail.html", {
                 "listing": listing,
-                "bid": bid,
-                "error_message": "Invalid bid amount."
+                "error_message": "Invalid bid amount. Please enter an integer number.",
+                "highest_bid": highest_bid,
+                "start_bid": start_bid,
             })
 
         if bid_amount <= listing.starting_bid:
             return render(request, "auctions/listing_detail.html", {
                 "listing": listing,
                 "error_message": "Bid amount must be greater than the starting bid - " + str(listing.starting_bid) + "$.",
-                "highest_bid": listing.bids.order_by('-amount').first().amount,
-                "start_bid": listing.starting_bid
+                "highest_bid": highest_bid,
+                "start_bid": start_bid,
             })
 
         if listing.bids.exists() and bid_amount <= listing.bids.order_by('-amount').first().amount:
             return render(request, "auctions/listing_detail.html", {
                 "listing": listing,
                 "error_message": "Bid amount must be greater than the current highest bid - " + str(listing.bids.order_by('-amount').first().amount) + "$.",
-                "highest_bid": listing.bids.order_by('-amount').first().amount,
-                "start_bid": listing.starting_bid
+                "highest_bid": highest_bid,
+                "start_bid":  start_bid,
             })
 
         # Save bid
         bid = Bid(user=request.user, listing=listing, amount=bid_amount)
         bid.save()
 
-        #return redirect("listing-detail", title=title)
         return HttpResponseRedirect(reverse("listing-detail", args=(listing.title,)))
     else:
         return redirect("listing-detail", title=title)
