@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from django.utils import timezone
 
 class User(AbstractUser):
     watchlist = models.ManyToManyField("Listing", blank=True, related_name="watchlist")
@@ -30,6 +30,17 @@ class Listing(models.Model):
         default=DRONES,
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, related_name="listings")
+    closed_at = models.DateTimeField(blank=True, null=True)
+    winner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="won_auctions")
+
+    @property
+    def is_closed(self):
+        return self.closed_at is not None
+
+    def close(self):
+        if not self.closed_at:
+            self.closed_at = timezone.now()
+            self.save()
     
     def __str__(self):
         return f"{self.id}: {self.title.split(" ")[0]} --> Starting bid - {self.starting_bid}, Category - {self.category}."

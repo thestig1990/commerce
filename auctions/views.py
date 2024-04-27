@@ -234,4 +234,20 @@ def add_comment(request, title):
         return redirect("listing-detail", title=title)
     else:
         return redirect("listing-detail", title=title)
-    
+
+
+def close_auction(request, title):
+    # Get listing object by its title
+    listing = get_object_or_404(Listing, title=title)
+
+    # Check if the current user is the author of the auction
+    if listing.user == request.user:
+        if not listing.is_closed:  # check if the auction is not closed
+            highest_bid = listing.bids.order_by('-amount').first()  # get highest bid for the listing object
+            if highest_bid:  # check if bids are present in the auction
+                # Determine the winner
+                listing.winner = highest_bid.user
+                # Calling the close method from the Listing model
+                listing.close()
+            return redirect("listing-detail", title=title)
+    return redirect("index")
