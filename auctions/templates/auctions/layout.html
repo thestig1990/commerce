@@ -22,31 +22,29 @@
         </div>
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+                <a class="nav-link active" href="{% url 'index' %}">Active Listings</a>
             </li>
             {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'show_watchlist' %}">
-                        <p class="text-primary">
-                            Watchlist
-                            <span class="badge badge-primary">
-                                {{ watch_listings_count }}
-                            </span>
-                        </p>
+                    <a class="nav-link active" href="{% url 'show_watchlist' %}">
+                        Watchlist
+                        <span class="badge badge-primary">
+                            {{ watch_listings_count }}
+                        </span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'create-listing' %}">Create Listing</a>
+                    <a class="nav-link active" href="{% url 'create-listing' %}">Create Listing</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    <a class="nav-link active" href="{% url 'logout' %}">Log Out</a>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    <a class="nav-link active" href="{% url 'login' %}">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    <a class="nav-link active" href="{% url 'register' %}">Register</a>
                 </li>
             {% endif %}
         </ul>
