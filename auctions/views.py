@@ -18,7 +18,14 @@ def index(request):
         watch_listings_count = request.user.watchlist.all().count()
     except AttributeError:
         watch_listings_count = None
-        
+
+    # Get listing categories from model
+    try:
+        categories = Listing.CATEGORY_CHOICES
+    except AttributeError:
+        categories = []
+    list_categories = [category[1] for category in categories]
+    
     # Create a dict where the last highest bids for each listing are saved
     last_bids = {}
 
@@ -34,6 +41,7 @@ def index(request):
         "listings": listings,
         "last_bids": last_bids,
         "watch_listings_count": watch_listings_count,
+        "list_categories": list_categories,
     })
 
 
