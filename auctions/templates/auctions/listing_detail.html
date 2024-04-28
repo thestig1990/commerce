@@ -47,69 +47,78 @@
                 <h6><span class="badge bg-info">Current Bid: {{ highest_bid }}$</span></h6>
             {% elif start_bid %}
                 <h6><span class="badge bg-info">Current Bid: {{ start_bid }}$</span></h6>
+            {% endif %}
+            <p><small>
+                {{ bids_count }} bids(s) so far.
+                {% if request.user == bid_obj.user %}
+                    Your bid is the current bid.
+                {% endif %}
+            </small></p>
+        </div>
+
+        
+        <div class="mb-5">
+            {% if user.is_authenticated %}
+
+                {% if not listing.closed_at %}
+                    
+                    {% if listing.user == request.user %}
+                        <a href="{% url 'close_auction' listing.title %}" class="badge badge-warning" style="margin-bottom: 18px;">
+                            Close Auction
+                        </a>   
+                    {% endif %}
+
+                    <form action="{% url 'place_bid' listing.title %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="bid_amount">Bid amount:</label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="bid_amount" name="bid_amount" placeholder="Bid">
+                            </div>
+                                
+                            <div class="form-group">
+                                <input type="submit" class="btn btn-primary" value="Place bid">
+                            </div>
+                        </div>
+                    </form>
+                    
+                    {% if error_message %}
+                        <div class="alert alert-danger" role="alert">
+                            <p>{{ error_message }}</p>
+                        </div>
+                    {% endif %}
+
+                {% elif listing.closed_at %}
+
+                    <div class="alert alert-danger" role="alert">
+                        Auction is closed!
+                    </div>
+
+                    {% if request.user == listing.winner %}
+
+                        <div class="alert alert-success" role="alert">
+                            Your bid is a winning one! Congratulations!
+                        </div>
+
+                    {% endif %}
+
+                {% endif %}
+
             {% else %}
-                <h6><span class="badge bg-info">Current Bid: {{ start_bid }}$</span></h6>
+                <div class="alert alert-danger" role="alert">
+                    Log in to place a Bid!
+                </div>  
             {% endif %}
         </div>
 
-
-        {% if user.is_authenticated %}
-
-            {% if not listing.closed_at %}
-                
-                {% if listing.user == request.user %}
-                    <a href="{% url 'close_auction' listing.title %}" class="badge badge-warning" style="margin-bottom: 18px;">
-                        Close Auction
-                    </a>   
-                {% endif %}
-
-                <form action="{% url 'place_bid' listing.title %}" method="post">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="bid_amount">Bid amount:</label>
-                        <div class="form-group">
-                            <input type="text" class="form-control" id="bid_amount" name="bid_amount" placeholder="Bid">
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" class="btn btn-primary" value="Place bid">
-                        </div>
-                    </div>
-                </form>
-                
-                {% if error_message %}
-                    <div class="alert alert-danger" role="alert">
-                        <p>{{ error_message }}</p>
-                    </div>
-                {% endif %}
-
-            {% elif listing.closed_at %}
-
-                <div class="alert alert-danger" role="alert">
-                    Auction is closed!
-                </div>
-
-                {% if request.user == listing.winner %}
-
-                    <div class="alert alert-success" role="alert">
-                        Your bid is a winning one! Congratulations!
-                    </div>
-
-                {% endif %}
-
-            {% endif %}
-
-        {% else %}
-            <div class="alert alert-danger" role="alert">
-                Log in to place a Bid!
-            </div>  
-        {% endif %}
-        
-        <h6 class="card-detail">Details:</h6>
-        <ul class="list-group list-group-flush"> 
-            <li class="list-group-item">Listed by: {{ listing.user }}</li>
-            <li class="list-group-item">Category: {{ listing.category}}</li>
-            <li class="list-group-item">{{ listing.description|linebreaksbr }}</li>
-        </ul>
+        <div class="mb-4">
+            <h6 class="card-detail">Details:</h6>
+            <ul class="list-group list-group-flush"> 
+                <li class="list-group-item">Listed by: {{ listing.user }}</li>
+                <li class="list-group-item">Category: {{ listing.category}}</li>
+                <li class="list-group-item">{{ listing.description|linebreaksbr }}</li>
+            </ul>
+        </div>
     </div>
 
     <div class="card-footer">

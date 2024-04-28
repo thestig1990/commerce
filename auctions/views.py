@@ -134,12 +134,20 @@ def listing_detail(request, title):
 
     # Get all listing comments
     comments = listing.comments.all()
+
+    # Get the number of bids for the current listing
+    bids_count = listing.bids.count()
+
+    # Get the highest bid object
+    bid_obj = listing.bids.order_by("-amount").first()
     
     context = {
     "listing": listing,
     "highest_bid": highest_bid,
     "start_bid": start_bid,
     "comments": comments,
+    "bids_count": bids_count,
+    "bid_obj": bid_obj,
     }
 
     return render(request, "auctions/listing_detail.html", context)
@@ -178,9 +186,14 @@ def place_bid(request, title):
     # Get a listing object by its title
     listing = get_object_or_404(Listing, title=title)
 
-    # Get a highest bid and starting bid for the listing
-    highest_bid = listing.bids.order_by('-amount').first().amount
-    start_bid = listing.starting_bid,
+    # Get the starting bid for the listing
+    start_bid = listing.starting_bid
+    
+    # Get a highest bid for the listing
+    try:
+        highest_bid = listing.bids.order_by('-amount').first().amount
+    except AttributeError:
+        highest_bid = start_bid      
 
     if request.method == "POST":
         bid_amount = request.POST["bid_amount"]
