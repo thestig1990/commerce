@@ -13,6 +13,8 @@ def index(request):
     # Get all listing objects
     listings = Listing.objects.all()
 
+    # Get
+
     # Create a dict where the last highest bids for each listing are saved
     last_bids = {}
 
