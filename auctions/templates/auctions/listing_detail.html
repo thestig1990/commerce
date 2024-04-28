@@ -4,7 +4,7 @@
 
 {% if user.is_authenticated %}
     {% if listing not in user.watchlist.all %}
-        <a href="{% url 'add_to_watchlist' listing.title%}" class="badge badge-secondary" style="margin-bottom: 18px;">
+        <a href="{% url 'add_to_watchlist' listing.title %}" class="badge badge-secondary" style="margin-bottom: 18px;">
             Add to Wathlist
         </a>
     {% else %}
@@ -51,34 +51,66 @@
                 <h6><span class="badge bg-info">Current Bid: {{ start_bid }}$</span></h6>
             {% endif %}
         </div>
-        
+
+
         {% if user.is_authenticated %}
-            <form action="{% url 'place_bid' listing.title %}" method="post">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="bid_amount">Bid amount:</label>
+
+            {% if not listing.closed_at %}
+                
+                {% if listing.user == request.user %}
+                    <a href="{% url 'close_auction' listing.title %}" class="badge badge-warning" style="margin-bottom: 18px;">
+                        Close Auction
+                    </a>   
+                {% endif %}
+
+                <form action="{% url 'place_bid' listing.title %}" method="post">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <input type="text" class="form-control" id="bid_amount" name="bid_amount" placeholder="Bid">
+                        <label for="bid_amount">Bid amount:</label>
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="bid_amount" name="bid_amount" placeholder="Bid">
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-primary" value="Place bid">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <input type="submit" class="btn btn-primary" value="Place bid">
+                </form>
+                
+                {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        <p>{{ error_message }}</p>
                     </div>
-                </div>
-            </form>
-            
-            {% if error_message %}
+                {% endif %}
+
+            {% elif listing.closed_at %}
+
                 <div class="alert alert-danger" role="alert">
-                    <p>{{ error_message }}</p>
+                    Auction is closed!
                 </div>
+
+                {% if request.user == listing.winner %}
+
+                    <div class="alert alert-success" role="alert">
+                        Your bid is a winning one! Congratulations!
+                    </div>
+
+                {% endif %}
+
             {% endif %}
+
         {% else %}
             <div class="alert alert-info" role="alert">
                 Log in to place a Bid!
-            </div>        
+            </div>  
+                
         {% endif %}
-            
+        
         <h6 class="card-detail">Details:</h6>
-        <p class="card-text">{{ listing.description|linebreaksbr }}</p>
+        <ul class="list-group list-group-flush"> 
+            <li class="list-group-item">Listed by: {{ listing.user }}</li>
+            <li class="list-group-item">Category: {{ listing.category}}</li>
+            <li class="list-group-item">{{ listing.description|linebreaksbr }}</li>
+        </ul>
     </div>
 
     <div class="card-footer">
@@ -107,7 +139,6 @@
                     <div class="d-flex align-items-center mb-3">
                         <p class="mb-0">
                             {{ comment.timestamp }}
-                            <!-- <span class="badge bg-primary">Pending</span> -->
                         </p>
                     </div>
                     <p class="mb-1">
