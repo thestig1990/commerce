@@ -13,8 +13,12 @@ def index(request):
     # Get all listing objects
     listings = Listing.objects.all()
 
-    # Get
-
+    # Get the number of all listings in the current user watchlist
+    try:
+        watch_listings_count = request.user.watchlist.all().count()
+    except AttributeError:
+        watch_listings_count = None
+        
     # Create a dict where the last highest bids for each listing are saved
     last_bids = {}
 
@@ -29,6 +33,7 @@ def index(request):
     return render(request, "auctions/index.html", {
         "listings": listings,
         "last_bids": last_bids,
+        "watch_listings_count": watch_listings_count,
     })
 
 
@@ -86,6 +91,12 @@ def register(request):
 
 # @login_required
 def create_listing(request):
+    # Get the number of all listings in the current user watchlist
+    try:
+        watch_listings_count = request.user.watchlist.all().count()
+    except AttributeError:
+        watch_listings_count = None
+    
     if request.user.is_authenticated:
         if request.method == "POST":
             title = request.POST["title"]
@@ -111,7 +122,9 @@ def create_listing(request):
             
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "auctions/create_listing.html")
+            return render(request, "auctions/create_listing.html", {
+                "watch_listings_count": watch_listings_count,
+            })
 
     else:
         return render(request, "auctions/create_listing.html", {
@@ -122,6 +135,12 @@ def create_listing(request):
 def listing_detail(request, title):
     # Get a listing object by its title
     listing = get_object_or_404(Listing, title=title)
+
+    # Get the number of all listings in the current user watchlist
+    try:
+        watch_listings_count = request.user.watchlist.all().count()
+    except AttributeError:
+        watch_listings_count = None
 
     # Get the last highest bid for the listing if it exist
     try:
@@ -150,6 +169,7 @@ def listing_detail(request, title):
     "comments": comments,
     "bids_count": bids_count,
     "bid_obj": bid_obj,
+    "watch_listings_count": watch_listings_count,
     }
 
     return render(request, "auctions/listing_detail.html", context)
@@ -266,3 +286,30 @@ def close_auction(request, title):
                 listing.close()
             return redirect("listing-detail", title=title)
     return redirect("index")
+
+
+@login_required
+def show_watchlist(request):
+    
+    # Get all listings in the current user watchlist
+    watch_listings = request.user.watchlist.all()
+
+    # Get the number of all listings in the current user watchlist
+    watch_listings_count = request.user.watchlist.all().count()
+
+    # Create a dict where the last highest bids for each listing are saved
+    last_bids = {}
+
+    # For each listing get the last highest bid if it exist
+    for listing in watch_listings:
+        try:
+            highest_bid = listing.bids.order_by("-amount").first().amount
+        except AttributeError:
+            highest_bid = None
+        last_bids[listing.title] = highest_bid
+
+    return render(request, "auctions/watchlist.html",{
+        "watch_listings": watch_listings,
+        "last_bids": last_bids,
+        "watch_listings_count": watch_listings_count,
+    })
