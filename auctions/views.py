@@ -23,7 +23,7 @@ def index(request):
     try:
         categories = Listing.CATEGORY_CHOICES
     except AttributeError:
-        categories = []
+        categories = [(None, "No categories available"),]
     list_categories = [category[1] for category in categories]
     
     # Create a dict where the last highest bids for each listing are saved
@@ -104,6 +104,13 @@ def create_listing(request):
         watch_listings_count = request.user.watchlist.all().count()
     except AttributeError:
         watch_listings_count = None
+
+    # Get listing categories from model
+    try:
+        categories = Listing.CATEGORY_CHOICES
+    except AttributeError:
+        categories = [(None, "No categories available"),]
+    list_categories = [category[1] for category in categories]
     
     if request.user.is_authenticated:
         if request.method == "POST":
@@ -132,6 +139,7 @@ def create_listing(request):
         else:
             return render(request, "auctions/create_listing.html", {
                 "watch_listings_count": watch_listings_count,
+                "list_categories": list_categories,
             })
 
     else:
@@ -149,6 +157,13 @@ def listing_detail(request, title):
         watch_listings_count = request.user.watchlist.all().count()
     except AttributeError:
         watch_listings_count = None
+
+    # Get listing categories from model
+    try:
+        categories = Listing.CATEGORY_CHOICES
+    except AttributeError:
+        categories = [(None, "No categories available"),]
+    list_categories = [category[1] for category in categories]
 
     # Get the last highest bid for the listing if it exist
     try:
@@ -178,6 +193,7 @@ def listing_detail(request, title):
     "bids_count": bids_count,
     "bid_obj": bid_obj,
     "watch_listings_count": watch_listings_count,
+    "list_categories": list_categories,
     }
 
     return render(request, "auctions/listing_detail.html", context)
@@ -298,6 +314,12 @@ def close_auction(request, title):
 
 @login_required
 def show_watchlist(request):
+    # Get listing categories from model
+    try:
+        categories = Listing.CATEGORY_CHOICES
+    except AttributeError:
+        categories = [(None, "No categories available"),]
+    list_categories = [category[1] for category in categories]
     
     # Get all listings in the current user watchlist
     watch_listings = request.user.watchlist.all()
@@ -319,5 +341,47 @@ def show_watchlist(request):
     return render(request, "auctions/watchlist.html",{
         "watch_listings": watch_listings,
         "last_bids": last_bids,
+        "watch_listings_count": watch_listings_count,
+        "list_categories": list_categories,
+    })
+
+
+@login_required
+def listings_by_category(request, category):
+    # Get listing categories from model
+    try:
+        categories = Listing.CATEGORY_CHOICES
+    except AttributeError:
+        categories = [(None, "No categories available"),]
+    list_categories = [category[1] for category in categories]
+
+    # Get the number of all listings in the current user watchlist
+    watch_listings_count = request.user.watchlist.all().count()
+    
+    # Get all listing objects
+    listings = Listing.objects.all()
+
+    # Get listings by its category
+    for abbreviation, full_name_category in Listing.CATEGORY_CHOICES:
+        if full_name_category.lower() == category.lower():
+            listings_by_category = listings.filter(category=abbreviation)
+            category_name = full_name_category
+
+    # Create a dict where the last highest bids for each listing are saved
+    last_bids = {}
+
+    # For each listing get the last highest bid if it exist
+    for listing in listings_by_category:
+        try:
+            highest_bid = listing.bids.order_by("-amount").first().amount
+        except AttributeError:
+            highest_bid = None
+        last_bids[listing.title] = highest_bid
+
+    return render(request, "auctions/listings_by_category.html",{
+        "listings_by_category": listings_by_category,
+        "category_name": category_name,
+        "last_bids": last_bids,
+        "list_categories": list_categories,
         "watch_listings_count": watch_listings_count,
     })

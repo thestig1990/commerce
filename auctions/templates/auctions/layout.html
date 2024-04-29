@@ -28,18 +28,18 @@
                 <a class="nav-link active" href="{% url 'index' %}">Active Listings</a>
             </li>
 
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Categories
-                </a>
-                <div class="dropdown-menu">
-                    {% for category in list_categories %}
-                        <a class="dropdown-item" href="{% url 'index' %}">{{ category }}</a>
-                    {% endfor %}
-                </div>
-            </li>
-
             {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        Categories
+                    </a>
+                    <div class="dropdown-menu">
+                        {% for category in list_categories %}
+                            <a class="dropdown-item" href="{% url 'listings_by_category' category|lower %}">{{ category }}</a>
+                        {% endfor %}
+                    </div>
+                </li>
+
                 <li class="nav-item">
                     <a class="nav-link active" href="{% url 'show_watchlist' %}">
                         Watchlist

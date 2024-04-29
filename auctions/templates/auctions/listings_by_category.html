@@ -1,0 +1,49 @@
+{% extends 'auctions/layout.html' %}
+{% load custom_filters %}
+
+
+{% block body %}
+
+    <h3>Listings by {{ category_name }} category</h3>                                 
+    
+    {% if listings_by_category %}
+        
+        {% for listing in listings_by_category %}
+
+            <div class="card mb-3 bg-light">
+                {% if listing.image %}
+                <img 
+                src="{{ listing.image }}"
+                class="card-img-top"
+                alt="Auction Item"
+                style="max-width: 10%; height: auto;">
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'listing-detail' listing.title%}">{{ listing.title }}</a>
+                    </h5>
+                    <p class="card-text"><small>{{ listing.description|title}}</small></p>
+                    {% with last_bid=last_bids|get_item:listing.title %}
+                        {% if last_bid %}
+                            <h6><span class="badge bg-info">Current Bid: {{ last_bid }}$</span></h6>
+                        {% elif not last_bid%}
+                            <h6><span class="badge bg-info">Current Bid: {{ listing.starting_bid }}$</span></h6>
+                        {% else %}
+                            <h6><span class="badge bg-info">No bids yet and no starting bid:</span></h6>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+        {% endfor %}
+    
+    {% else %}
+        <div class="alert alert-secondary" role="alert">
+            There are no listings in the {{ category_name }} category!
+        </div>  
+    {% endif %}
+        
+
+
+{% endblock %}
