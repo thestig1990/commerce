@@ -22,7 +22,7 @@ class Listing(models.Model):
     title = models.CharField(max_length=32)
     description = models.TextField()
     starting_bid = models.IntegerField()
-    image = models.ImageField(blank=True)
+    image = models.URLField(blank=True)
     category = models.CharField(
         max_length=2,
         blank=True,
