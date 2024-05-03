@@ -4,34 +4,38 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-
+    
+    
     {% for listing in listings %}
-        <div class="card mb-3 bg-light">
-            
-            {% if listing.image %}
-                <img 
-                src="{{ listing.image }}"
-                class="card-img-top"
-                alt="Auction Item"
-                style="max-width: 20%; height: auto;">
-            {% endif %}
+        {% if not listing.closed_at %}
+            <div class="card mb-3 bg-light">
+                
+                {% if listing.image %}
+                    <img 
+                    src="{{ listing.image }}"
+                    class="card-img-top"
+                    alt="Auction Item"
+                    style="max-width: 20%; height: auto;">
+                {% endif %}
 
-            <div class="card-body">
-                <h5 class="card-title">
-                    <a href="{% url 'listing-detail' listing.title%}">{{ listing.title }}</a>
-                </h5>
-                <p class="card-text">{{ listing.description|linebreaksbr}}</p>
-                {% with last_bid=last_bids|get_item:listing.title %}
-                    {% if last_bid %}
-                        <h6><span class="badge bg-info">Current Bid: {{ last_bid }}$</span></h6>
-                    {% elif not last_bid%}
-                        <h6><span class="badge bg-info">Current Bid: {{ listing.starting_bid }}$</span></h6>
-                    {% else %}
-                        <h6><span class="badge bg-info">No bids yet and no starting bid:</span></h6>
-                    {% endif %}
-                {% endwith %}
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'listing-detail' listing.title%}">{{ listing.title }}</a>
+                    </h5>
+                    <p class="card-text">{{ listing.description|linebreaksbr}}</p>
+                    {% with last_bid=last_bids|get_item:listing.title %}
+                        {% if last_bid %}
+                            <h6><span class="badge bg-info">Current Bid: {{ last_bid }}$</span></h6>
+                        {% elif not last_bid%}
+                            <h6><span class="badge bg-info">Current Bid: {{ listing.starting_bid }}$</span></h6>
+                        {% else %}
+                            <h6><span class="badge bg-info">No bids yet and no starting bid:</span></h6>
+                        {% endif %}
+                    {% endwith %}
+                </div>
             </div>
-        </div>
+        {% endif %}
     {% endfor %}
+        
 {% endblock %}
     

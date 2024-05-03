@@ -356,7 +356,10 @@ def listings_by_category(request, category):
     list_categories = [category[1] for category in categories]
 
     # Get the number of all listings in the current user watchlist
-    watch_listings_count = request.user.watchlist.all().count()
+    try:
+        watch_listings_count = request.user.watchlist.all().count()
+    except AttributeError:
+        watch_listings_count = None
     
     # Get all listing objects
     listings = Listing.objects.all()
@@ -384,4 +387,34 @@ def listings_by_category(request, category):
         "last_bids": last_bids,
         "list_categories": list_categories,
         "watch_listings_count": watch_listings_count,
+    })
+
+
+def closed_listings(request):
+    # Get listing categories from model
+    try:
+        categories = Listing.CATEGORY_CHOICES
+    except AttributeError:
+        categories = [(None, "No categories available"),]
+    list_categories = [category[1] for category in categories]
+    
+    # Get the number of all listings in the current user watchlist
+    try:
+        watch_listings_count = request.user.watchlist.all().count()
+    except AttributeError:
+        watch_listings_count = None
+        
+    # Get all closed listings
+    try:
+        closed_listings = Listing.objects.exclude(closed_at__isnull=True)
+    except AttributeError:
+        closed_listings = None
+
+    error_message = "There are no closed listings!"
+    
+    return render(request, "auctions/closed_listings.html", {
+        "closed_listings": closed_listings,
+        "error_message": error_message,
+        "watch_listings_count": watch_listings_count,
+        "list_categories": list_categories,
     })
