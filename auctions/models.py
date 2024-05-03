@@ -43,7 +43,7 @@ class Listing(models.Model):
             self.save()
     
     def __str__(self):
-        return f"{self.id}: {self.title.split(" ")[0]} --> Starting bid - {self.starting_bid}, Category - {self.category}."
+        return f"{self.id}: {self.title} --> Starting bid - {self.starting_bid}, Category - {self.category}."
 
 
 class Bid(models.Model):
@@ -53,7 +53,7 @@ class Bid(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"Id: {self.id}; {self.amount}$ per Listing - {self.listing.title} and User - {self.user.username}."
+        return f"Bid - {self.amount}$; per Listing - {self.listing.title}; User - {self.user.username}."
 
 
 class Comment(models.Model):
@@ -63,4 +63,4 @@ class Comment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"Id: {self.id}; comment - {self.comment}; per Listing {self.listing.title} from User - {self.user.username}."
+        return f"Comment - {self.comment}; per Listing {self.listing.title}; User - {self.user.username}."
